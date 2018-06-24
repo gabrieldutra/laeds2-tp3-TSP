@@ -1,119 +1,125 @@
 package algorithms.bruteforce;
 
-import util.CitiesMap;
-import java.util.Arrays;
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+import util.JGrafo;
+import java.math.BigInteger;
 
-public class BruteForce extends CitiesMap {
+public class BruteForce {
+    
+    JGrafo g;
+    
+    public BruteForce(JGrafo g) {
+        this.g = g;
+    }
+    
+    // Recebido o grafico, deveriam ser gerados todos os caminhos que, partindo 
+    // de um dado vertice, retornem ao mesmo apos passar por todos os outros
+    
+    // Se eu enumerar os vertices de 1 a n, colocar , criar n! permutacoes e 
+    // testar se cada permutaçao permite um caminho valido (ou seja, que cumpra
+    // a questao do problema). Se sim, calcular o tamanho do caminho e ver se e 
+    // o menor encontrado.
+    
+    static public int[] findPermutation(int n, long k) {
+        // Esse metodo foi copiado (e depois, adaptado) de 
+        // https://stackoverflow.com/questions/31216097/given-n-and-k-return-the-kth-permutation-sequence
+        int[] numbers = new int[n];
+        long[] indices = new long[n];
 
-	private int bestPath[];
-	private int totalDistance;
-	
-	// Internal auxiliar variables 
-	int path[];
-	int visited; // count the amount of cities visited
-	
-	public BruteForce(String fileName) {
-		super(fileName);
-		// The path is a circuit, so the first and last elements are the same city
-		this.bestPath = new int [this.getDimension() + 1];
-		// Finds the best path
-		this.totalDistance = -1; // Invalid total distance
-		this.findBestPath();
-	}
-	
-	public int[] getBestPath() {
-		return bestPath;
-	}
+        // initialise the numbers 1, 2, 3...
+        for (int i = 0; i < n; i++)
+                numbers[i] = i + 1;
 
-	public int getTotalDistance() {
-		return totalDistance;
-	}
+        long divisor = 1;
+        for (long place = 1; place <= n; place++) {
+                if((k / divisor) == 0)
+                        break;	// all the remaining indices will be zero
 
-	@Override
-	public String toString() {
-		return "SalesmanPath [\n\tname = " + this.getName() + ", totalDistance = " + totalDistance + ",\n\tbestPath = " + Arrays.toString(bestPath)
-				+ "\n]";
-	}
+            // compute the index at that place:
+            long aux = (k / divisor) % place;
+            indices[n -(int) place] = (k / divisor) % place;
+            divisor *= place;
+        }
 
-	// Returns the distance between two cities
-	private int dist(int city1, int city2){
-		return this.getGraph().getWeight(city1, city2);
-	}
-	
-	// Method to find the best path
-	private void findBestPath(){
-		// The method will try to find the best path for every starting point and will use the minimum
-		for(int start = 0; start < this.getDimension(); start++){
-			findBestPath(start);	
-		}	
-	}
-	
-	// Sets all cities as unvisited
-	private void setAllUnvisited(){
-		for(int i = 0; i < this.getDimension(); i++)
-			this.getGraph().setUnvisited(i);
-		this.visited = 0;
-	}
-	
-	// Visits a city
-	private void visitCity(int when, int to){
-		path[when] = to;
-		this.getGraph().setVisited(to);
-		visited++;
-	}
-	
-	// Finds ou if a city was visited
-	private boolean wasVisited(int city){
-		return this.getGraph().wasVisited(city);
-	}
-	
-	// Method to find the best path from a begining point
-	private void findBestPath(int start){
-		int n = this.getDimension(); // for readability
-		int lastCity, minDist = 0, moment = 0;
-		
-		this.path = new int[this.getDimension() + 1];
-		this.visited = 0; 
-		
-		setAllUnvisited();
-		
-		visitCity(moment, start); // visits the first city in time 0
-		lastCity = start;
-//		System.out.println(Arrays.toString(this.path) + " > " + this.visited);
-		// Repeats until all cities were visited
-		while(visited < n){
-//			System.out.println("LC:" + lastCity + " MD:" + minDist + " M:" + moment);
-			moment++;
-			
-			// Finds the closest city
-			int closest = -1, closestDist = -1;
-			for(int i = 0; i < n; i++){
-				if(!wasVisited(i)){
-					if(dist(lastCity, i) < closestDist || closestDist == -1){ // If it's the first iteration or found a closer city
-						closest = i;
-						closestDist = dist(lastCity, closest);
-					}
-				}
-			}
-			
-			// Updates distance
-			minDist += dist(lastCity, closest);
-			
-			// Visits the closest city
-			visitCity(moment, closest);
-			lastCity = closest;
-//			System.out.println(Arrays.toString(this.path) + " > " + minDist);
-			
-		}
-		
-		// Returns to the first city
-		visitCity(moment + 1, start);
-		minDist += dist(lastCity, start);
-		
-		if(minDist < this.totalDistance || this.totalDistance == -1){
-			this.totalDistance = minDist;
-			this.bestPath = this.path.clone();
-		}
-//		System.out.println(Arrays.toString(this.path) + " -----> " + minDist);
-	}
+        // print out the indices:
+        // System.out.println(Arrays.toString(indices));
+
+        // permute the numbers array according to the indices:
+        for (int i = 0; i < n; i++) {
+            long index = indices[i] + i;
+
+            // take the element at index and place it at i, moving the rest up
+            if(index != i) {
+                int temp = numbers[(int) index];
+                for(int j = (int) index; j > i; j--)
+                   numbers[j] = numbers[j-1];
+                numbers[i] = temp;
+            }
+        }
+
+        return numbers;
+    }
+    
+    public static long factorial(long number) {
+        long result = 1;
+
+        for (long factor = 2; factor <= number; factor++) {
+            result = result * factor;
+        }
+
+        return result;
+    }
+    
+    boolean validPermutation(int[] permut) {
+        // Verifica se existe um ciclo entre os vertices propostos pela
+        // permutacao
+        for (int i = 0; i < permut.length - 1; i++) {
+            if (!g.existsEdge(permut[i], permut[i + 1])) {
+                return false;
+            }
+        }
+        int lenght = permut.length;
+        return g.existsEdge(permut[lenght - 1], permut[0]);
+    }
+    
+    int lenghtPermut(int[] permut) {
+        // Calcula o comprimento do caminho proposto pela permutacao
+        int lenght = 0;
+        
+        for (int i = 0; i < permut.length - 1; i++) {
+            lenght += permut[i] + permut[i + 1];
+        }
+        
+        lenght += permut[permut.length - 1] + permut[0];
+        
+        return lenght;
+    }
+    
+    int[] rodaCaminhos() {
+        // Recolhendo o numero de vertices do grafo
+        int numV = g.getVertices();
+        long fact = factorial(numV);
+        
+        int[] savePermut;
+        int fasterLenghtPath = 1000000000; // numero absurdo
+        int[] permut = null;
+        
+        for (long i = 0; i < fact; i++) {
+            permut = findPermutation(numV, i);
+            
+            if (validPermutation(permut) == true) {
+                int lenghtPath = lenghtPermut(permut);
+                if (lenghtPath < fasterLenghtPath) {
+                    fasterLenghtPath = lenghtPath;
+                }
+            }
+            
+        }
+        
+        return permut;
+        
+    }
+    
 }

@@ -79,20 +79,21 @@ public class JGrafo {
 	 */
 	public JGrafo(int vertices) {
 		
-		this.numVertices = vertices;
-		this.mat = new Edge[vertices][vertices];
-		this.pos = new int[vertices];
-		this.vertices = new Vertex[vertices];
-		
-		for(int i = 0; i < vertices; i++)
-			this.vertices[i] = new Vertex(i);
-		
-		for(int i = 0; i < vertices ; i++){
-			for(int j = 0; j < vertices ; j++){
-				this.mat[i][j] = new Edge(this.vertices[i], this.vertices[j], 0);
-				this.pos[i] = -1;
-			}
-		}
+            this.numVertices = vertices;
+            this.mat = new Edge[vertices][vertices];
+            this.pos = new int[vertices];
+            this.vertices = new Vertex[vertices];
+
+            for(int i = 0; i < vertices; i++)
+                    this.vertices[i] = new Vertex(i);
+
+            for(int i = 0; i < vertices ; i++){
+                for(int j = 0; j < vertices ; j++){
+                        this.mat[i][j] = new Edge(this.vertices[i], this.vertices[j], 0);
+                        this.pos[i] = -1;
+                }
+            }
+            
 	}
 	
 	//Getters e Setters
