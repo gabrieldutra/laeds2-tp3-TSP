@@ -16,12 +16,14 @@ public class Main {
         
         System.out.println("");
         
+        System.out.println("-- pa561.tsp -- ");
         testMatrix = FileWorker.extractAdjacencyMatrix("datasets/pa561.tsp", 561, true);
         heuristic = new Heuristic(testMatrix, 561);
         heuristic.calculateHeuristic();
         
         System.out.println("");
         
+        System.out.println("-- si535.tsp -- ");
         testMatrix = FileWorker.extractAdjacencyMatrix("datasets/si535.tsp", 535, false);
         heuristic = new Heuristic(testMatrix, 535);
         heuristic.calculateHeuristic();
