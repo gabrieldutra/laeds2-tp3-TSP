@@ -9,7 +9,7 @@ import java.util.Scanner;
  * @author gabriel
  */
 public class FileWorker {
-    public static int[][] extractAdjacencyMatrix(String fileName, int size) {
+    public static int[][] extractAdjacencyMatrix(String fileName, int size, boolean lowerMatrix) {
         File file = new File(fileName);
         int[][] adjacencyMatrix = new int[size][size];
         
@@ -21,8 +21,14 @@ public class FileWorker {
             
             int i, j;
             for (i = 0; i < size; i++) {
-                for (j = i; j < size; j++) {
-                    adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = scanner.nextInt();
+                if(lowerMatrix) {                    
+                    for (j = 0; j <= i; j++) {
+                        adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = scanner.nextInt();
+                    }                    
+                } else {                    
+                    for (j = i; j < size; j++) {
+                        adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = scanner.nextInt();
+                    }
                 }
             }
         } catch (FileNotFoundException ex) {

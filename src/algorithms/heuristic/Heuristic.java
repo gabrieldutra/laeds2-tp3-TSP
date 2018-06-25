@@ -1,5 +1,8 @@
 package algorithms.heuristic;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 /**
  *
  * @author gabriel
@@ -16,7 +19,7 @@ public class Heuristic {
     }
 
     private class MST {
-        
+
         int parent[];
         int key[];
 
@@ -40,6 +43,15 @@ public class Heuristic {
             }
 
             return min_index;
+        }
+        // A utility function to print the constructed MST stored in
+        // parent[]
+        void printMST(int parent[], int n, int graph[][]) {
+            System.out.println("Edge   Weight");
+            for (int i = 1; i < size; i++) {
+                System.out.println(parent[i] + " - " + i + "    "
+                        + graph[i][parent[i]]);
+            }
         }
 
         /**
@@ -98,5 +110,68 @@ public class Heuristic {
     public void calculateHeuristic() {
         // First - calculate the AGM in the matrix
         this.mst.primMST(adjacencyMatrix);
+
+        ArrayList<Integer> adjList[] = (ArrayList<Integer>[]) new ArrayList[size];
+        int i;
+        for (i = 0; i < size; i++) {
+            if (adjList[i] == null) {
+                adjList[i] = new ArrayList<>();
+            }
+            if (this.mst.parent[i] != -1) {
+                adjList[i].add(this.mst.parent[i]);
+                if (adjList[this.mst.parent[i]] == null) {
+                    adjList[this.mst.parent[i]] = new ArrayList<>();
+                }
+                adjList[this.mst.parent[i]].add(i);
+            }
+        }
+        
+        int start = 1;
+        
+        // Find the first vertice that is a leaf
+        for (i = 0; i < size; i++) {
+            if (adjList[i].size() == 1) {
+                start = i;
+            }
+        }
+
+        // DFS in the tree
+        boolean cityVisited[] = new boolean[size];
+
+        int city = start;
+        cityVisited[start] = true;
+        int cost = 0;
+        int citiesVisited = 1;
+        
+        Stack<Integer> way = new Stack();
+        way.push(city);
+        
+        while (citiesVisited <= size) {
+            boolean foundCity = false;
+            for (int c : adjList[city]) {
+                if (cityVisited[c]) {
+                    continue;
+                }
+                citiesVisited++;
+                cityVisited[c] = true;
+                cost += adjacencyMatrix[city][c];
+                city = c;
+                foundCity = true;
+                way.push(city);
+            }
+            if (!foundCity) {
+                if (way.empty()) {
+                    System.out.println("Final cities number: " + citiesVisited);
+                    System.out.println("Final cost: " + cost);
+                    break;
+                }
+                
+                int backCity = way.pop();
+                if (backCity == city) {
+                    backCity = way.pop();
+                }
+                city = backCity;
+            }
+        }
     }
 }
